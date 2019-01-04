@@ -23,6 +23,10 @@ type chessPiece(color : Color) =
   member this.availableMoves (board : Board) : (Position list * chessPiece list) =
     let possibleMoves, possibleKills = board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
 /// A board §\label{chessBoardBegin}§
+    for x = 0 to 7 do
+      for y = 0 to 7 do
+        board.[x,y]
+        
 and Board () =
   let _array = Collections.Array2D.create<chessPiece option> 8 8 None
   /// Wrap a position as option type
