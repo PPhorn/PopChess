@@ -21,13 +21,19 @@ type chessPiece(color : Color) =
   abstract member candiateRelativeMoves : Position list list
   /// Available moves and neighbours ([(1,0); (2,0);...], [p1; p2])
   member this.availableMoves (board : Board) : (Position list * chessPiece list) =
-    let possibleMoves, possibleKills = board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
+    //possibleMoves gets list of vacant squares from the vacant function in
+    //scope of getVacantNNeighbours
+    //possibleKills gets list of squares with opponent pieces from the opponent
+    //function in scope of getVacantNNeighbours
+    board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
 /// A board §\label{chessBoardBegin}§
-    // Hint kode fra Cami
-    let p.option : chessPiece option = board.[i,j]
-    for x = 0 to 7 do
-      for y = 0 to 7 do
-        board.[x,y]
+//     let possibleMoves, possibleKills = board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
+// /// A board §\label{chessBoardBegin}§
+//     // Hint kode fra Cami
+//     let p.option : chessPiece option = board.[i,j]
+//     for x = 0 to 7 do
+//       for y = 0 to 7 do
+//         board.[x,y]
 
 and Board () =
   let _array = Collections.Array2D.create<chessPiece option> 8 8 None

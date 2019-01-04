@@ -57,6 +57,8 @@ Available moves skal tage højde for, hvilken type modstander brik, der er inden
 I bordet laves et array i 2d, hvor i hvert coordinat er der some eller none brik.
 Husk at pakke option typen ud, før den kan "bruges" i andet kode som værende brik.
 
-Vi skal lave noget kode, der kan tilgå alle brikker på bordet. 
+Vi skal lave noget kode, der kan tilgå alle brikker på bordet.
+
+er det en konge der rykkes skal der tjekkes for alle vertikale og horisontale squares der er til bordets yderkanter, for om der står et tårn, da et tårn potentielt ved næste tur kan rykke hele board-bredden og højden. Det kan vi dog ikke tjekke via tårnets possibleMoves, fordi den givne kode er sat til, at et tårn ikke kan rykke sig forbi en anden brik og derfor ikke medtager pladserne på modsatte side af en modstanden ud til bordets kant.
 
 \end{document}
