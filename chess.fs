@@ -7,6 +7,17 @@ type Position = int * int(*//§\label{chessTypeEnd}§*)
 //af relative moves.
 type chessPiece(color : Color) =
   let mutable _position : Position option = None
+  //
+  // member this. (p: chessPiece) : =
+  //   match this.color with
+  //   Black ->
+  //            match whiteChessPieces with
+  //            R this._position p._position
+  //            | K
+  //   | White -> blackChessPieces
+
+  //skal have modstander farven som input
+
   abstract member nameOfType : string // "king", "rook", ...
   member this.color = color // White, Black
   member this.position // E.g., (0,0), (3,4), etc.
@@ -28,15 +39,38 @@ type chessPiece(color : Color) =
     //possibleKills gets list of squares with opponent pieces from the opponent
     //function in scope of getVacantNNeighbours
 
+
+    let ChessPieces (b: Board) : chessPiece option list =
+      let mutable newList = List.empty<chessPiece option>
+      for i = 0 to 7 do
+        for j = 0 to 7 do
+          let piece : chessPiece option = b.[i,j]
+          match piece with
+            Some piece -> newList <- board.[i,j] :: newList
+            | None -> ()
+      newList
+
+
+    let k = ChessPieces board
+    printfn "Hej: %A" k
     board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
 /// A board §\label{chessBoardBegin}§
-//     let possibleMoves, possibleKills = board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
+     //let possibleMoves, possibleKills = board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
 // /// A board §\label{chessBoardBegin}§
 //     // Hint kode fra Cami
 //     let p.option : chessPiece option = board.[i,j]
 //     for x = 0 to 7 do
 //       for y = 0 to 7 do
 //         board.[x,y]
+
+
+  // let mutable whiteChessPieces = List.empty<chessPiece option>
+  // for i = 0 to 7 do
+  //   for j = 0 to 7 do
+  //     match board.[i,j].color with
+  //     Black -> blackChessPieces <- blackChessPieces :: board.[i,j]
+  //     | White -> whiteChessPieces <- whiteChessPieces :: board.[i,j]
+
 
 and Board () =
   let _array = Collections.Array2D.create<chessPiece option> 8 8 None
