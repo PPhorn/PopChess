@@ -1,0 +1,15 @@
+# Compiled fsharp files
+*.exe
+*.dll
+
+# Latex related files
+*.log
+*.out
+*.aux
+*.pdf
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Files in development
+dev_*
