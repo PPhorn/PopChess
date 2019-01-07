@@ -2,7 +2,9 @@ module Chess (*//§\label{chessHeader}§*)
 type Color = White | Black
 type Position = int * int(*//§\label{chessTypeEnd}§*)
 /// An abstract chess piece §\label{chessPieceBegin}§
-[<AbstractClass>]
+[<AbstractClass>] //man kan ikke umiddelbart lave objecter af den type, fordi de
+//mangler deres implementation. Så alle brikker skal komme med en implementation
+//af relative moves.
 type chessPiece(color : Color) =
   let mutable _position : Position option = None
   abstract member nameOfType : string // "king", "rook", ...
@@ -25,6 +27,7 @@ type chessPiece(color : Color) =
     //scope of getVacantNNeighbours
     //possibleKills gets list of squares with opponent pieces from the opponent
     //function in scope of getVacantNNeighbours
+
     board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
 /// A board §\label{chessBoardBegin}§
 //     let possibleMoves, possibleKills = board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
@@ -88,6 +91,7 @@ and Board () =
     this.[fst target, snd target] <- this.[fst source, snd source]
     this.[fst source, snd source] <- None
   /// Find the tuple of empty squares and first neighbour if any.
+  //tager to funktioner og overskriver det der står på hhv. target og source
   member this.getVacantNOccupied (run : Position list) : (Position list * (chessPiece option)) =
     try
       // Find index of first non-vacant square of a run
@@ -106,12 +110,17 @@ and Board () =
         ([],[])
       | Some p ->
         let convertNWrap =
-          (relativeToAbsolute p) >> this.getVacantNOccupied
+          (relativeToAbsolute p) >> this.getVacantNOccupied // ">>" Funktions komposition
+          // Haer vi to funktioner g(f(x)), dvs. først udregner vi værdien af f på x og derefter g på det
+          // med piping ville vi skrive x|>f|>g. Her laver vi en funktion, som vi endnu ikke evaluerer. Og resultatet af funktionskomposition er en funktion. Ligesom h = f >> g eller h = g(f(x)), hvis vi ville vende det om kunne vi skrive g<<f. Vi ender med en funktion, der venter på et input.
         let vacantPieceLists = List.map convertNWrap piece.candiateRelativeMoves
         // Extract and merge lists of vacant squares
+        // den tager kalder convertNrap og får ud to lister. Hhv. listen af runs og listen af brikker den kan tage
         let vacant = List.collect fst vacantPieceLists
         // Extract and merge lists of first obstruction pieces and filter out own pieces
         let opponent =
           vacantPieceLists
-          |> List.choose snd
+          |> List.choose snd //pipen piper en liste ind i list.choose, det er det
+          //samme som  f(x) --> x|> f. list.choose tager to argumenter, men er her kun givet
+          //1 nemlig snd. Derfor piper vi en liste ind på den.
         (vacant, opponent)(*//§\label{chessBoardEnd}§*)
