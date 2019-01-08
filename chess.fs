@@ -46,30 +46,37 @@ type chessPiece(color : Color) =
       oppList
 
     let safeZone (b: Board) : Position list =
-      let mutable rookList = 
-        (ChessPieces b)
-        |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "rook")
-        |> List.map(fun (x : chessPiece) -> x.position.Value)
-      let mutable oppking = 
-        (ChessPieces b)
-        |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "king")
-      let mutable possibleMoves, _ = b.getVacantNNeighbours this
-      let mutable invalidMoves = []
-      for i = 0 to possibleMoves.Length - 1 do
-        for j = 0 to rookList.Length - 1 do
-          if (fst possibleMoves.[i] = fst rookList.[j]) || (snd possibleMoves.[i] = snd rookList.[j]) then
-            invalidMoves <- possibleMoves.[i] :: invalidMoves
-      //invalidMoves
-      for i = 0 to possibleMoves.Length - 1 do
-        for j = 0 to oppking.Length - 1 do
-          if (possibleMoves.[i] = (fst (b.getVacantNNeighbours oppking.[0])).[j]) then
-            invalidMoves <- possibleMoves.[i] :: invalidMoves
-      invalidMoves
+      if(this.nameOfType.ToLower() = "king") then
+        let mutable rookList = 
+          (ChessPieces b)
+          |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "rook")
+          |> List.map(fun (x : chessPiece) -> x.position.Value)
+        let mutable oppking = 
+          (ChessPieces b)
+          |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "king")
+        let mutable possibleMoves, _ = b.getVacantNNeighbours this
+        let mutable invalidMoves = []
+        //Checking for rook collision
+        for i = 0 to possibleMoves.Length - 1 do
+          for j = 0 to rookList.Length - 1 do
+            if (fst possibleMoves.[i] = fst rookList.[j]) || (snd possibleMoves.[i] = snd rookList.[j]) then
+              invalidMoves <- possibleMoves.[i] :: invalidMoves
+        //invalidMoves for king collision
+        let oppkingMoves = fst (b.getVacantNNeighbours oppking.[0])
+        for i = 0 to possibleMoves.Length - 1 do
+          for j = 0 to oppkingMoves.Length - 1 do
+            if (possibleMoves.[i] = oppkingMoves.[j]) then
+              invalidMoves <- possibleMoves.[i] :: invalidMoves
+        //possibleMoves <- List.filter(fun x -> List.exists(fun y -> y = x) invalidMoves) possibleMoves
+        invalidMoves
+      else 
+        fst (b.getVacantNNeighbours this)
+
 
     // printfn "%A" (oppCoord Black)
     let k = ChessPieces board
     let safe = safeZone board
-    printfn "Opps: %A og InvalidMoves: %A" k safe
+    printfn "Opps: %A og Invalid moves: %A" k safe
     board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
 /// A board §\label{chessBoardBegin}§
      //let possibleMoves, possibleKills = board.getVacantNNeighbours this
