@@ -50,4 +50,18 @@ let isCapitalized = System.Char.IsUpper pieceCharList
 //            match whiteChessPieces with
 //            R this._position p._position
 //            | K
-//   | White -> blackChessPieces
+//   | White -> blackChessPiece
+
+
+
+let safeMoves =
+  let mutable pisP = ChessPieces board //liste med output fra ChessPieces funktionen
+  let mutable safeMovesList = List.empty<Position list>
+  let possibleMoves, possibleKills = board.getVacantNNeighbours this
+  possibleMoves
+  let compareMossibleMovesNoppCoord =
+    List.compareWith (fun elm1 elm2 -> if elm1 = elm2 then elm1 = None) pisP possibleMoves
+  pisP
+  //for i in possibleMoves do
+  //   match this.position with
+  //     |i when fst = 1 -> printfn "NOW: %A" i
