@@ -76,11 +76,11 @@ type chessPiece(color : Color) =
       invalidMoves
 =======
       if(this.nameOfType.ToLower() = "king") then
-        let mutable rookList = 
+        let mutable rookList =
           (ChessPieces b)
           |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "rook")
           |> List.map(fun (x : chessPiece) -> x.position.Value)
-        let mutable oppking = 
+        let mutable oppking =
           (ChessPieces b)
           |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "king")
         let mutable possibleMoves, _ = b.getVacantNNeighbours this
@@ -98,7 +98,7 @@ type chessPiece(color : Color) =
               invalidMoves <- possibleMoves.[i] :: invalidMoves
         //possibleMoves <- List.filter(fun x -> x = invalidMoves) possibleMoves
         invalidToSafe b invalidMoves
-      else 
+      else
         fst (b.getVacantNNeighbours this)
 >>>>>>> b7a21fa2ce9fba3a41d6730c758a176abde23214
 
@@ -208,3 +208,28 @@ type Player (color: Color) =
   abstract member nameOfType : string
 
 type Human (color: Color) =
+  member this.playerColor = color // White, Black
+  member this.piecesOnBoard (b: Board) (col: Color) =
+
+    let myChessPieces (b: Board) (col: Color) : chessPiece list =
+      let mutable myList = List.empty<chessPiece option>
+      for i = 0 to 7 do
+        for j = 0 to 7 do
+          let piece : chessPiece option = b.[i,j]
+          match piece with
+            Some piece -> myList <- b.[i,j] :: myList
+            | None -> ()
+      let pieceList = (List.map Option.get myList) //fjerne option typen fra listen
+      //Filters the list so as to only hold opponent pieces
+      let oppList =
+        List.filter (fun (x : chessPiece) -> x.color = col) pieceList
+      oppList
+    //printfn "WOW: %A"
+    myChessPieces b color
+
+
+  member this.nextMove (b: Board) (piece : chessPiece) =
+    let anyPiece = (this.piecesOnBoard b this.playerColor)
+    let any = anyPiece.[0]
+    let onePieceMoves = any.availableMoves
+    onePieceMoves
