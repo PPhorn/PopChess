@@ -28,7 +28,7 @@ type chessPiece(color : Color) =
     //possibleKills gets list of squares with opponent pieces from the opponent
     //function in scope of getVacantNNeighbours
 
-    let ChessPieces (b: Board) (col: Color) : Position list =
+    let ChessPieces (b: Board) : chessPiece list =
       let mutable newList = List.empty<chessPiece option>
       for i = 0 to 7 do
         for j = 0 to 7 do
@@ -39,16 +39,37 @@ type chessPiece(color : Color) =
       let pieceList = (List.map Option.get (newList)) //fjerne option typen fra listen
       //Filters the list so as to only hold opponent pieces
       let oppList =
-        List.filter (fun (x : chessPiece) -> x.color = col) pieceList
+        List.filter (fun (x : chessPiece) -> x.color <> this.color) pieceList
       //Gets opponents coordinates
-      let lst = List.map (fun (x : chessPiece) -> x.position.Value) oppList
-      lst
+      //let lst = List.map (fun (x : chessPiece) -> x.position.Value) oppList
+      //lst
+      oppList
 
-
+    let safeZone (b: Board) : Position list =
+      let mutable rookList = 
+        (ChessPieces b)
+        |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "rook")
+        |> List.map(fun (x : chessPiece) -> x.position.Value)
+      let mutable oppking = 
+        (ChessPieces b)
+        |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "king")
+      let mutable possibleMoves, _ = b.getVacantNNeighbours this
+      let mutable invalidMoves = []
+      for i = 0 to possibleMoves.Length - 1 do
+        for j = 0 to rookList.Length - 1 do
+          if (fst possibleMoves.[i] = fst rookList.[j]) || (snd possibleMoves.[i] = snd rookList.[j]) then
+            invalidMoves <- possibleMoves.[i] :: invalidMoves
+      //invalidMoves
+      for i = 0 to possibleMoves.Length - 1 do
+        for j = 0 to oppking.Length - 1 do
+          if (possibleMoves.[i] = (fst (b.getVacantNNeighbours oppking.[0])).[j]) then
+            invalidMoves <- possibleMoves.[i] :: invalidMoves
+      invalidMoves
 
     // printfn "%A" (oppCoord Black)
-    let k = ChessPieces board White
-    printfn "Hej: %A" k
+    let k = ChessPieces board
+    let safe = safeZone board
+    printfn "Opps: %A og InvalidMoves: %A" k safe
     board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
 /// A board §\label{chessBoardBegin}§
      //let possibleMoves, possibleKills = board.getVacantNNeighbours this
