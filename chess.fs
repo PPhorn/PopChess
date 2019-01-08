@@ -174,3 +174,11 @@ and Board () =
           //samme som  f(x) --> x|> f. list.choose tager to argumenter, men er her kun givet
           //1 nemlig snd. Derfor piper vi en liste ind på den.
         (vacant, opponent)(*//§\label{chessBoardEnd}§*)
+
+[<AbstractClass>]
+type Player (color: Color) =
+  member this.playerColor = color
+  abstract member nextMove : Board -> string
+  abstract member nameOfType : string
+
+type Human (color: Color) =
