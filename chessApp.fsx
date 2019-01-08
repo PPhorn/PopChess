@@ -14,11 +14,11 @@ let pieces = [|
 // Place pieces on the board
 board.[0,0] <- Some pieces.[0]
 board.[1,1] <- Some pieces.[1]
-board.[4,1] <- Some pieces.[2]
+board.[0,2] <- Some pieces.[2]
 printfn "%A" board
 Array.iter (printPiece board) pieces
 
 // Make moves
-board.move (1,1) (3,1) // Moves a piece from (1,1) to (3,1)
+board.move (1,1) (3,3) // Moves a piece from (1,1) to (3,1)
 printfn "%A" board
 Array.iter (printPiece board) pieces
