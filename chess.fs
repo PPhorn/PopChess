@@ -45,24 +45,29 @@ type chessPiece(color : Color) =
       //lst
       oppList
 
-    let invalidToSafe (b: Board) (lst: Position list) =
-      let mutable possibleMoves, _ = b.getVacantNNeighbours this
+    let invalidToSafe (b: Board) (riskZonelist: Position list) =
+      let mutable possibleMoves, possibleKills = b.getVacantNNeighbours this
+      for elem in possibleKills do
+        possibleMoves <- elem.position.Value :: possibleMoves
       let mutable safeList = []
       for elem in possibleMoves do
-        if (List.exists(fun x -> x = elem) lst) = false then
+        if (List.exists(fun x -> x = elem) riskZonelist) = false then
           safeList <- elem :: safeList
       safeList
 
-    let safeZone (b: Board) : Position list =
+    let riskZone (b: Board) : Position list =
       if(this.nameOfType.ToLower() = "king") then
-        let mutable rookList = 
+        let mutable rookList =
           (ChessPieces b)
           |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "rook")
           |> List.map(fun (x : chessPiece) -> x.position.Value)
-        let mutable oppking = 
+        let mutable oppking =
           (ChessPieces b)
           |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "king")
         let mutable possibleMoves, _ = b.getVacantNNeighbours this
+        //for elem in possibleKills do
+          //possibleMoves <- elem.position.Value :: possibleMoves
+        printfn "DETTE ER: %A" possibleMoves
         let mutable invalidMoves = []
         //Checking for rook collision
         for i = 0 to possibleMoves.Length - 1 do
@@ -77,12 +82,12 @@ type chessPiece(color : Color) =
               invalidMoves <- possibleMoves.[i] :: invalidMoves
         //possibleMoves <- List.filter(fun x -> x = invalidMoves) possibleMoves
         invalidToSafe b invalidMoves
-      else 
+      else
         fst (b.getVacantNNeighbours this)
 
     // printfn "%A" (oppCoord Black)
     let k = ChessPieces board
-    let safe = safeZone board
+    let safe = riskZone board
     printfn "Opps: %A og Safe moves: %A" k safe
     board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
 /// A board §\label{chessBoardBegin}§
@@ -174,3 +179,47 @@ and Board () =
           //samme som  f(x) --> x|> f. list.choose tager to argumenter, men er her kun givet
           //1 nemlig snd. Derfor piper vi en liste ind på den.
         (vacant, opponent)(*//§\label{chessBoardEnd}§*)
+
+[<AbstractClass>]
+type Player (color: Color) =
+  member this.playerColor = color
+  abstract member nextMove : Board -> string
+  abstract member nameOfType : string
+  abstract member piecesOnBoard : Board -> chessPiece list
+
+type Human (color: Color) =
+  inherit Player(color)
+  override this.nameOfType = "Player" + string(color)
+  override this.piecesOnBoard (b: Board) =
+
+    let myChessPieces (b: Board) : chessPiece list =
+      let mutable myList = List.empty<chessPiece option>
+      for i = 0 to 7 do
+        for j = 0 to 7 do
+          let piece : chessPiece option = b.[i,j]
+          match piece with
+            Some piece -> myList <- b.[i,j] :: myList
+            | None -> ()
+      let pieceList = (List.map Option.get myList) //fjerne option typen fra listen
+      //Filters the list so as to only hold opponent pieces
+      let oppList =
+        List.filter (fun (x : chessPiece) -> x.color = color) pieceList
+      oppList
+    //printfn "WOW: %A"
+    myChessPieces b
+
+
+  override this.nextMove (b: Board) : string =
+    let anyPiece = (this.piecesOnBoard b)
+    let any = anyPiece.[0]
+    let onePieceMoves = any.availableMoves
+    printfn "Make a move"
+    let pattern = @"[a-h][1-8]\s[a-h][1-8]"
+    let move =
+      try
+        let input = System.Console.ReadLine()
+        if Regex.IsMatch(input, pattern) then
+          [((int input.[0]) - 97), int input.[1]); ((int input.[2]) - 97), int input.[3])]
+      with
+        | :? System.FormatException -> this.nextMove b
+    "onePieceMoves"

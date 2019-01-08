@@ -12,11 +12,13 @@ let pieces = [|
   rook (White) :> chessPiece;
   king (Black) :> chessPiece |]
 // Place pieces on the board
-board.[0,0] <- Some pieces.[0]
+board.[4,4] <- Some pieces.[0]
 board.[1,1] <- Some pieces.[1]
 board.[0,2] <- Some pieces.[2]
 printfn "%A" board
 Array.iter (printPiece board) pieces
+
+let newplayer = Human(Black)
 
 // Make moves
 board.move (1,1) (3,3) // Moves a piece from (1,1) to (3,1)
