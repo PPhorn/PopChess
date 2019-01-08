@@ -45,7 +45,16 @@ type chessPiece(color : Color) =
       //lst
       oppList
 
+    let invalidToSafe (b: Board) (lst: Position list) =
+      let mutable possibleMoves, _ = b.getVacantNNeighbours this
+      let mutable safeList = []
+      for elem in possibleMoves do
+        if (List.exists(fun x -> x = elem) lst) = false then
+          safeList <- elem :: safeList
+      safeList
+
     let safeZone (b: Board) : Position list =
+<<<<<<< HEAD
       let mutable rookList =
         (ChessPieces b)
         |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "rook")
@@ -65,11 +74,42 @@ type chessPiece(color : Color) =
           if (possibleMoves.[i] = (fst (b.getVacantNNeighbours oppking.[0])).[j]) then
             invalidMoves <- possibleMoves.[i] :: invalidMoves
       invalidMoves
+=======
+      if(this.nameOfType.ToLower() = "king") then
+        let mutable rookList = 
+          (ChessPieces b)
+          |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "rook")
+          |> List.map(fun (x : chessPiece) -> x.position.Value)
+        let mutable oppking = 
+          (ChessPieces b)
+          |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "king")
+        let mutable possibleMoves, _ = b.getVacantNNeighbours this
+        let mutable invalidMoves = []
+        //Checking for rook collision
+        for i = 0 to possibleMoves.Length - 1 do
+          for j = 0 to rookList.Length - 1 do
+            if (fst possibleMoves.[i] = fst rookList.[j]) || (snd possibleMoves.[i] = snd rookList.[j]) then
+              invalidMoves <- possibleMoves.[i] :: invalidMoves
+        //invalidMoves for king collision
+        let oppkingMoves = fst (b.getVacantNNeighbours oppking.[0])
+        for i = 0 to possibleMoves.Length - 1 do
+          for j = 0 to oppkingMoves.Length - 1 do
+            if (possibleMoves.[i] = oppkingMoves.[j]) then
+              invalidMoves <- possibleMoves.[i] :: invalidMoves
+        //possibleMoves <- List.filter(fun x -> x = invalidMoves) possibleMoves
+        invalidToSafe b invalidMoves
+      else 
+        fst (b.getVacantNNeighbours this)
+>>>>>>> b7a21fa2ce9fba3a41d6730c758a176abde23214
 
     // printfn "%A" (oppCoord Black)
     let k = ChessPieces board
     let safe = safeZone board
+<<<<<<< HEAD
     printfn "Opps: %A og InvalidMoves: %A" k safe
+=======
+    printfn "Opps: %A og Safe moves: %A" k safe
+>>>>>>> b7a21fa2ce9fba3a41d6730c758a176abde23214
     board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
 /// A board §\label{chessBoardBegin}§
      //let possibleMoves, possibleKills = board.getVacantNNeighbours this
@@ -160,3 +200,11 @@ and Board () =
           //samme som  f(x) --> x|> f. list.choose tager to argumenter, men er her kun givet
           //1 nemlig snd. Derfor piper vi en liste ind på den.
         (vacant, opponent)(*//§\label{chessBoardEnd}§*)
+
+[<AbstractClass>]
+type Player (color: Color) =
+  member this.playerColor = color
+  abstract member nextMove : Board -> string
+  abstract member nameOfType : string
+
+type Human (color: Color) =
