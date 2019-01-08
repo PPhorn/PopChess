@@ -45,36 +45,17 @@ type chessPiece(color : Color) =
       //lst
       oppList
 
-    let invalidToSafe (b: Board) (lst: Position list) =
-      let mutable possibleMoves, _ = b.getVacantNNeighbours this
+    let invalidToSafe (b: Board) (riskZonelist: Position list) =
+      let mutable possibleMoves, possibleKills = b.getVacantNNeighbours this
+      for elem in possibleKills do
+        possibleMoves <- elem.position.Value :: possibleMoves
       let mutable safeList = []
       for elem in possibleMoves do
-        if (List.exists(fun x -> x = elem) lst) = false then
+        if (List.exists(fun x -> x = elem) riskZonelist) = false then
           safeList <- elem :: safeList
       safeList
 
-    let safeZone (b: Board) : Position list =
-<<<<<<< HEAD
-      let mutable rookList =
-        (ChessPieces b)
-        |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "rook")
-        |> List.map(fun (x : chessPiece) -> x.position.Value)
-      let mutable oppking =
-        (ChessPieces b)
-        |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "king")
-      let mutable possibleMoves, _ = b.getVacantNNeighbours this
-      let mutable invalidMoves = []
-      for i = 0 to possibleMoves.Length - 1 do
-        for j = 0 to rookList.Length - 1 do
-          if (fst possibleMoves.[i] = fst rookList.[j]) || (snd possibleMoves.[i] = snd rookList.[j]) then
-            invalidMoves <- possibleMoves.[i] :: invalidMoves
-      //invalidMoves
-      for i = 0 to possibleMoves.Length - 1 do
-        for j = 0 to oppking.Length - 1 do
-          if (possibleMoves.[i] = (fst (b.getVacantNNeighbours oppking.[0])).[j]) then
-            invalidMoves <- possibleMoves.[i] :: invalidMoves
-      invalidMoves
-=======
+    let riskZone (b: Board) : Position list =
       if(this.nameOfType.ToLower() = "king") then
         let mutable rookList =
           (ChessPieces b)
@@ -84,6 +65,9 @@ type chessPiece(color : Color) =
           (ChessPieces b)
           |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "king")
         let mutable possibleMoves, _ = b.getVacantNNeighbours this
+        //for elem in possibleKills do
+          //possibleMoves <- elem.position.Value :: possibleMoves
+        printfn "DETTE ER: %A" possibleMoves
         let mutable invalidMoves = []
         //Checking for rook collision
         for i = 0 to possibleMoves.Length - 1 do
@@ -100,16 +84,11 @@ type chessPiece(color : Color) =
         invalidToSafe b invalidMoves
       else
         fst (b.getVacantNNeighbours this)
->>>>>>> b7a21fa2ce9fba3a41d6730c758a176abde23214
 
     // printfn "%A" (oppCoord Black)
     let k = ChessPieces board
-    let safe = safeZone board
-<<<<<<< HEAD
-    printfn "Opps: %A og InvalidMoves: %A" k safe
-=======
+    let safe = riskZone board
     printfn "Opps: %A og Safe moves: %A" k safe
->>>>>>> b7a21fa2ce9fba3a41d6730c758a176abde23214
     board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
 /// A board §\label{chessBoardBegin}§
      //let possibleMoves, possibleKills = board.getVacantNNeighbours this
@@ -206,12 +185,14 @@ type Player (color: Color) =
   member this.playerColor = color
   abstract member nextMove : Board -> string
   abstract member nameOfType : string
+  abstract member piecesOnBoard : Board -> chessPiece list
 
 type Human (color: Color) =
-  member this.playerColor = color // White, Black
-  member this.piecesOnBoard (b: Board) (col: Color) =
+  inherit Player(color)
+  override this.nameOfType = "Player" + string(color)
+  override this.piecesOnBoard (b: Board) =
 
-    let myChessPieces (b: Board) (col: Color) : chessPiece list =
+    let myChessPieces (b: Board) : chessPiece list =
       let mutable myList = List.empty<chessPiece option>
       for i = 0 to 7 do
         for j = 0 to 7 do
@@ -222,14 +203,23 @@ type Human (color: Color) =
       let pieceList = (List.map Option.get myList) //fjerne option typen fra listen
       //Filters the list so as to only hold opponent pieces
       let oppList =
-        List.filter (fun (x : chessPiece) -> x.color = col) pieceList
+        List.filter (fun (x : chessPiece) -> x.color = color) pieceList
       oppList
     //printfn "WOW: %A"
-    myChessPieces b color
+    myChessPieces b
 
 
-  member this.nextMove (b: Board) (piece : chessPiece) =
-    let anyPiece = (this.piecesOnBoard b this.playerColor)
+  override this.nextMove (b: Board) : string =
+    let anyPiece = (this.piecesOnBoard b)
     let any = anyPiece.[0]
     let onePieceMoves = any.availableMoves
-    onePieceMoves
+    printfn "Make a move"
+    let pattern = @"[a-h][1-8]\s[a-h][1-8]"
+    let move =
+      try
+        let input = System.Console.ReadLine()
+        if Regex.IsMatch(input, pattern) then
+          [((int input.[0]) - 97), int input.[1]); ((int input.[2]) - 97), int input.[3])]
+      with
+        | :? System.FormatException -> this.nextMove b
+    "onePieceMoves"
