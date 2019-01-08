@@ -1,4 +1,5 @@
 module Chess (*//§\label{chessHeader}§*)
+open System.Text.RegularExpressions
 type Color = White | Black
 type Position = int * int(*//§\label{chessTypeEnd}§*)
 /// An abstract chess piece §\label{chessPieceBegin}§
@@ -216,10 +217,11 @@ type Human (color: Color) =
     printfn "Make a move"
     let pattern = @"[a-h][1-8]\s[a-h][1-8]"
     let move =
-      try
-        let input = System.Console.ReadLine()
-        if Regex.IsMatch(input, pattern) then
-          [((int input.[0]) - 97), int input.[1]); ((int input.[2]) - 97), int input.[3])]
-      with
-        | :? System.FormatException -> this.nextMove b
-    "onePieceMoves"
+      let input = System.Console.ReadLine()
+      if Regex.IsMatch(input, pattern) then
+        input
+          //[((int input.[0]) - 97), int input.[1]); ((int input.[2]) - 97), int input.[3])]
+      else
+        this.nextMove b
+    move
+    //"onePieceMoves"
