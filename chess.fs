@@ -45,6 +45,14 @@ type chessPiece(color : Color) =
       //lst
       oppList
 
+    let invalidToSafe (b: Board) (lst: Position list) =
+      let mutable possibleMoves, _ = b.getVacantNNeighbours this
+      let mutable safeList = []
+      for elem in possibleMoves do
+        if (List.exists(fun x -> x = elem) lst) = false then
+          safeList <- elem :: safeList
+      safeList
+
     let safeZone (b: Board) : Position list =
       if(this.nameOfType.ToLower() = "king") then
         let mutable rookList = 
@@ -67,16 +75,15 @@ type chessPiece(color : Color) =
           for j = 0 to oppkingMoves.Length - 1 do
             if (possibleMoves.[i] = oppkingMoves.[j]) then
               invalidMoves <- possibleMoves.[i] :: invalidMoves
-        //possibleMoves <- List.filter(fun x -> List.exists(fun y -> y = x) invalidMoves) possibleMoves
-        invalidMoves
+        //possibleMoves <- List.filter(fun x -> x = invalidMoves) possibleMoves
+        invalidToSafe b invalidMoves
       else 
         fst (b.getVacantNNeighbours this)
-
 
     // printfn "%A" (oppCoord Black)
     let k = ChessPieces board
     let safe = safeZone board
-    printfn "Opps: %A og Invalid moves: %A" k safe
+    printfn "Opps: %A og Safe moves: %A" k safe
     board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
 /// A board §\label{chessBoardBegin}§
      //let possibleMoves, possibleKills = board.getVacantNNeighbours this
