@@ -28,7 +28,7 @@ type chessPiece(color : Color) =
     //possibleKills gets list of squares with opponent pieces from the opponent
     //function in scope of getVacantNNeighbours
 
-    let ChessPieces (b: Board) : chessPiece list =
+    let ChessPieces (b: Board) (col: Color) : Position list =
       let mutable newList = List.empty<chessPiece option>
       for i = 0 to 7 do
         for j = 0 to 7 do
@@ -37,19 +37,17 @@ type chessPiece(color : Color) =
             Some piece -> newList <- board.[i,j] :: newList
             | None -> ()
       let pieceList = (List.map Option.get (newList)) //fjerne option typen fra listen
-      pieceList
+      //Filters the list so as to only hold opponent pieces
+      let oppList =
+        List.filter (fun (x : chessPiece) -> x.color = col) pieceList
+      //Gets opponents coordinates
+      let lst = List.map (fun (x : chessPiece) -> x.position.Value) oppList
+      lst
 
-    //Gets opponents coordinates
-    let oppCoord (col: Color)=
-      let pis = ChessPieces board //liste med output fra ChessPieces funktionen
-      let mutable oppCoList = List.empty<Position list>
-      for p in pis do
-        if p.color = col then
-          oppCoList <- [(Option.get p.position)] :: oppCoList
-      oppCoList
 
-    printfn "%A" (oppCoord Black)
-    let k = ChessPieces board
+
+    // printfn "%A" (oppCoord Black)
+    let k = ChessPieces board White
     printfn "Hej: %A" k
     board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
 /// A board §\label{chessBoardBegin}§
