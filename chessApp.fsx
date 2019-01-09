@@ -18,8 +18,8 @@ board.[0,2] <- Some pieces.[2]
 printfn "%A" board
 Array.iter (printPiece board) pieces
 
-let newplayer = Human(Black)
-newplayer.nextMove board
+let newplayer = Human(White)
+printfn "%A" (newplayer.nextMove board)
 
 // Make moves
 board.move (1,1) (3,3) // Moves a piece from (1,1) to (3,1)
