@@ -187,8 +187,8 @@ type Player (color: Color) =
 type Human (color: Color) =
   inherit Player(color)
   override this.nameOfType = "Player" + string(color)
-  override this.piecesOnBoard (b: Board) : chessPiece list =
 
+  override this.piecesOnBoard (b: Board) : chessPiece list =
     let myChessPieces (b: Board) : chessPiece list =
       let mutable myList = List.empty<chessPiece option>
       for i = 0 to 7 do
@@ -206,29 +206,40 @@ type Human (color: Color) =
     myChessPieces b
 
 
-  member this.nextMove (b: Board) (color: Color) : string =
-    let anyPiece : chessPiece list = (this.piecesOnBoard b) //Holds a list of the players´ pieces on the board
-    //let any = anyPiece.[0]
-    let mutable anyMoves : Position list list = //Collects possibleMoves of the players´ pieces on the board
-      anyPiece
-      |> List.map(fun x -> fst (x.availableMoves b))
+  member this.nextMove (b: Board) : string =
     printfn "Make a move"
-    let pattern = @"[a-h][1-8]\s[a-h][1-8]" //Pattern of chess move e.g. a5 a4
-    printfn "Move options: %A: %A" anyPiece.Head anyMoves.Head
-    let input = System.Console.ReadLine() //Takes console input from user
-    let move =
-      let somePieceMoves : Position list = anyMoves.Head
-      if Regex.IsMatch(input, pattern) then //Checks if the console input is valid i.e. if it matches the pattern or matches "quit"
-        //input
-        let inputAsMove : Position list = [((int input.[0]) - 97, (int input.[1]) - 49); ((int input.[3]) - 97, (int input.[4]) - 49)] //converts the console string input from letter+number to the corresponding coordinate on the board. e.g from a4 to (0,4)
-        if List.exists(fun x -> x = inputAsMove.[1]) somePieceMoves then //Checks if the user input matches any valid moves for the possibleM ove list
+    let mutable input = System.Console.ReadLine() //Takes console input from user
+
+    let checkInput =
+      let pattern = @"[a-h][1-8]\s[a-h][1-8]" //Pattern of chess move e.g. a5 a4
+      Regex.IsMatch(input, pattern) || (input = "quit")
+
+    let checkMoveInput =
+      let liste1 = this.piecesOnBoard b
+      if checkInput && input = "quit" then
+        input
+      elif checkInput && input <> "quit" then
+        let chosenPiece : chessPiece =
+          let coordOfchosenPiece = ((int input.[0]) - 97, (int input.[1]) - 49)
+          b.[fst coordOfchosenPiece, snd coordOfchosenPiece].Value
+        let movesOfchosenPiece = fst (chosenPiece.availableMoves b)
+        let inputAsMove : Position = ((int input.[3]) - 97, (int input.[4]) - 49) //converts the console string input from letter+number to the corresponding coordinate on the board. e.g from a4 to (0,4)
+        if (List.exists (fun x -> x = chosenPiece) liste1) && (List.exists(fun x -> x = inputAsMove) movesOfchosenPiece) then //Checks if the user input matches any valid moves for the possibleM ove list
           printfn "Great Move"
           input //Returns the console input
         else
-          printfn "Invalid move, Try again"
-          this.nextMove b color
-      elif input = "quit" then
-        "Okay"
+          printfn "Not a valid chess piece, try again"
+          this.nextMove b
       else
-        this.nextMove b color //Reruns the method in case of invalid move input
-    string (input)
+        printfn "Invalid move, Try again"
+        this.nextMove b
+
+    checkMoveInput
+
+// type Game () =
+//   let PlayerBlack = Human(Black)
+//   let PlayerWhite = Human(White)
+//
+//   member this.run (b: Board) (piece : chessPiece) : string =
+
+      // this.Piece.Position = toSquare
