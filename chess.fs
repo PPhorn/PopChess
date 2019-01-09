@@ -1,5 +1,6 @@
 module Chess (*//§\label{chessHeader}§*)
 open System.Text.RegularExpressions
+open System
 type Color = White | Black
 type Position = int * int(*//§\label{chessTypeEnd}§*)
 /// An abstract chess piece §\label{chessPieceBegin}§
@@ -206,8 +207,8 @@ type Human (color: Color) =
     myChessPieces b
 
 
-  member this.nextMove (b: Board) : string =
-    printfn "Make a move"
+  member this.nextMove (b: Board) (p: Human) : string =
+    printfn "Make a move Player %A" p.playerColor
     let mutable input = System.Console.ReadLine() //Takes console input from user
 
     let checkInput =
@@ -229,12 +230,36 @@ type Human (color: Color) =
           input //Returns the console input
         else
           printfn "Not a valid chess piece, try again"
-          this.nextMove b
+          this.nextMove b p
       else
         printfn "Invalid move, Try again"
-        this.nextMove b
+        this.nextMove b p
 
     checkMoveInput
+
+type Game(p1: Human, p2: Human, b: Board) =
+    let turn = p1
+    let inputAsMove (input: string) : Position list = 
+        [((int input.[0]) - 97, (int input.[1]) - 49); ((int input.[3]) - 97, (int input.[4]) - 49)]
+    let moveSource (lst: Position List) : Position = 
+        lst.[0]
+    let moveTarget (lst: Position List) : Position = 
+        lst.[1]
+    member this.run(p: Human) =
+      Console.Clear()
+      printfn "%A" b
+      if not (p1.piecesOnBoard b).IsEmpty || not (p2.piecesOnBoard b).IsEmpty then
+        match p.playerColor with
+        White -> 
+            let move = inputAsMove (p1.nextMove b p)
+            b.move (moveSource move) (moveTarget move)
+            this.run(p2)
+        | Black -> 
+            let move = inputAsMove (p2.nextMove b p)
+            b.move (moveSource move) (moveTarget move)
+            this.run(p1)
+      else
+        Environment.Exit(0)
 
 // type Game () =
 //   let PlayerBlack = Human(Black)

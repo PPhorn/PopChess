@@ -3,6 +3,8 @@ open Chess
 open Pieces
 type Game(p1: Player, p2: Player, b: Board) =
     let turn = p1
+    let inputAsMove (input: string) : Position list = 
+        [((int input.[0]) - 97, (int input.[1]) - 49); ((int input.[3]) - 97, (int input.[4]) - 49)]
     member this.run(p: Player) =
         p.nextMove b
         // let inputAsMove (input: string) : Position list = 
