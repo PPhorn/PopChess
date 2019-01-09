@@ -68,7 +68,6 @@ type chessPiece(color : Color) =
         let mutable possibleMoves, _ = b.getVacantNNeighbours this
         //for elem in possibleKills do
           //possibleMoves <- elem.position.Value :: possibleMoves
-        printfn "DETTE ER: %A" possibleMoves
         let mutable invalidMoves = []
         //Checking for rook collision
         for i = 0 to possibleMoves.Length - 1 do
@@ -86,11 +85,8 @@ type chessPiece(color : Color) =
       else
         fst (b.getVacantNNeighbours this)
 
-    // printfn "%A" (oppCoord Black)
-    let k = ChessPieces board
-    let safe = riskZone board
-    printfn "Opps: %A og Safe moves: %A" k safe
-    board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
+    (riskZone board, snd (board.getVacantNNeighbours this))
+
 /// A board §\label{chessBoardBegin}§
      //let possibleMoves, possibleKills = board.getVacantNNeighbours this
 
@@ -191,7 +187,7 @@ type Player (color: Color) =
 type Human (color: Color) =
   inherit Player(color)
   override this.nameOfType = "Player" + string(color)
-  override this.piecesOnBoard (b: Board) =
+  override this.piecesOnBoard (b: Board) : chessPiece list =
 
     let myChessPieces (b: Board) : chessPiece list =
       let mutable myList = List.empty<chessPiece option>
@@ -211,23 +207,26 @@ type Human (color: Color) =
 
 
   override this.nextMove (b: Board) : string =
-    let anyPiece = (this.piecesOnBoard b)
+    let anyPiece : chessPiece list = (this.piecesOnBoard b) //Holds a list of the players´ pieces on the board
     //let any = anyPiece.[0]
-    let mutable anyMoves = 
+    let mutable anyMoves : Position list list = //Collects possibleMoves of the players´ pieces on the board
       anyPiece
       |> List.map(fun x -> fst (x.availableMoves b))
     printfn "Make a move"
-    let pattern = @"[a-h][1-8]\s[a-h][1-8]"
-    printfn "%A" anyMoves
+    let pattern = @"[a-h][1-8]\s[a-h][1-8]" //Pattern of chess move e.g. a5 a4
+    printfn "Move options: %A: %A" anyPiece.Head anyMoves.Head
     let move =
-      let input = System.Console.ReadLine()
-      if Regex.IsMatch(input, pattern) || input = "quit" then
+      let somePieceMoves : Position list = anyMoves.Head
+      let input = System.Console.ReadLine() //Takes console input from user
+      if Regex.IsMatch(input, pattern) || input = "quit" then //Checks if the console input is valid i.e. if it matches the pattern or matches "quit"
         //input
-        let possibleMove = [(int input.[0]) - 97, (int input.[1]) - 49; (int input.[3]) - 97, (int input.[4]) - 49]
-        if List.exists(fun x -> x = possibleMove.[0]) anyMoves || input = "quit" then
+        let possibleMove : Position list = [((int input.[0]) - 97, (int input.[1]) - 49); ((int input.[3]) - 97, (int input.[4]) - 49)] //converts the console string input from letter+number to the corresponding coordinate on the board. e.g from a4 to (0,4)
+        if List.exists(fun x -> x = possibleMove.[1]) somePieceMoves || input = "quit" then //Checks if the user input matches any valid moves for the possibleM ove list
         //if (List.forall(fun x -> x = fst possibleMove) anyMoves)
-          input
+          input //Returns the console input
+        else
+          "Invalid move, Try again"
       else
-        this.nextMove b
+        this.nextMove b //Reruns the method in case of invalid move input
     move
-    //"onePieceMoves"
+    "onePieceMoves"
