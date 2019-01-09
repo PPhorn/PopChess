@@ -232,11 +232,3 @@ type Human (color: Color) =
       else
         this.nextMove b color //Reruns the method in case of invalid move input
     string (input)
-
-// type Game () =
-//   let PlayerBlack = Human(Black)
-//   let PlayerWhite = Human(White)
-//
-//   member this.run =
-//
-//   this.run
