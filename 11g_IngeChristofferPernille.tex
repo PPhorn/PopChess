@@ -45,24 +45,46 @@
     rounded corners, minimum height = 2em]
 \tikzstyle{line} = [draw, -latex]
 
-
+\subsection*{UML}
 \begin{tikzpicture}
- \begin{class}[text width=5cm]{animal}{0,0}
+ \begin{class}[text width=5cm]{chessPiece}{0,0}
+  \attribute{color : color}
+  \attribute{position : int * int}
+  \operation{availableMoves board : (Position list * chessPiece list)}
+  \operation{nameOfType : string}
+  \operation{candiateRelativeMoves : Position list list}
  \end{class}
+ \begin{class}[text width=5cm]{rook}{-5,-4}
+  \inherit{chessPiece}
+ \end{class}
+ \begin{class}[text width=5cm]{king}{5,-4}
+  \inherit{chessPiece}
+ \end{class}
+ \begin{class}[text width=5cm]{Board}{0,-6}
+  \operation{Item : }
+  \operation{ToString : string}
+  \operation{move: unit}
+  \operation{getVacantNOccupied : (Position list * (chessPiece option)}
+  \operation{getVacantNNeighbours : (Position list * chessPiece list)}
+  \operation{move: }
+ \end{class}
+ \association{Board}{b}{1..*}{chessPiece}{1..*}{piece}
+ \begin{class}[text width=5cm]{Game}{0,-12}
+  \operation{run : unit}
+ \end{class}
+ \aggregation{Game}{b}{1}{Board}
+ \begin{class}[text width=5cm]{Player}{0,-14}
+  \attribute{playerColor : color}
+  \operation{nameOfType : string}
+  \operation{piecesOnBoard : chessPiece list}
+ \end{class}
+  \begin{class}[text width=5cm]{Human}{-7,-14}
+  \inherit{Player}
+  \operation{nextMove : string}
+ \end{class}
+ \aggregation{Game}{p}{1}{Human}
 \end{tikzpicture}
 
-Opgaven:
-Uppercase er det ene hold lowercase er modstander.
-Vi skal ikke foreslå felter, som en modstander brik kan rykke hen på. 
-Hver opmærksom på brikkers mulighed for at rykke forbi hinanden.
 
-Available moves skal tage højde for, hvilken type modstander brik, der er indenfor rækkevidde, da det afgører, hvor det skal være muligt og ikke-muligt at rykke hen på. 
-
-I bordet laves et array i 2d, hvor i hvert coordinat er der some eller none brik.
-Husk at pakke option typen ud, før den kan "bruges" i andet kode som værende brik.
-
-Vi skal lave noget kode, der kan tilgå alle brikker på bordet.
-
-er det en konge der rykkes skal der tjekkes for alle vertikale og horisontale squares der er til bordets yderkanter, for om der står et tårn, da et tårn potentielt ved næste tur kan rykke hele board-bredden og højden. Det kan vi dog ikke tjekke via tårnets possibleMoves, fordi den givne kode er sat til, at et tårn ikke kan rykke sig forbi en anden brik og derfor ikke medtager pladserne på modsatte side af en modstanden ud til bordets kant.
 
 \end{document}
