@@ -1,4 +1,5 @@
 module Chess (*//§\label{chessHeader}§*)
+open System.Text.RegularExpressions
 type Color = White | Black
 type Position = int * int(*//§\label{chessTypeEnd}§*)
 /// An abstract chess piece §\label{chessPieceBegin}§
@@ -211,15 +212,22 @@ type Human (color: Color) =
 
   override this.nextMove (b: Board) : string =
     let anyPiece = (this.piecesOnBoard b)
-    let any = anyPiece.[0]
-    let onePieceMoves = any.availableMoves
+    //let any = anyPiece.[0]
+    let mutable anyMoves = 
+      anyPiece
+      |> List.map(fun x -> fst (x.availableMoves b))
     printfn "Make a move"
     let pattern = @"[a-h][1-8]\s[a-h][1-8]"
+    printfn "%A" anyMoves
     let move =
-      try
-        let input = System.Console.ReadLine()
-        if Regex.IsMatch(input, pattern) then
-          [((int input.[0]) - 97), int input.[1]); ((int input.[2]) - 97), int input.[3])]
-      with
-        | :? System.FormatException -> this.nextMove b
-    "onePieceMoves"
+      let input = System.Console.ReadLine()
+      if Regex.IsMatch(input, pattern) || input = "quit" then
+        //input
+        let possibleMove = [(int input.[0]) - 97, (int input.[1]) - 49; (int input.[3]) - 97, (int input.[4]) - 49]
+        if List.exists(fun x -> x = possibleMove.[0]) anyMoves || input = "quit" then
+        //if (List.forall(fun x -> x = fst possibleMove) anyMoves)
+          input
+      else
+        this.nextMove b
+    move
+    //"onePieceMoves"
