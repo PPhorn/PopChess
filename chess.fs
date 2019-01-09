@@ -180,7 +180,7 @@ and Board () =
 [<AbstractClass>]
 type Player (color: Color) =
   member this.playerColor = color
-  abstract member nextMove : Board -> string
+  //abstract member nextMove : Board : Color -> string
   abstract member nameOfType : string
   abstract member piecesOnBoard : Board -> chessPiece list
 
@@ -206,7 +206,7 @@ type Human (color: Color) =
     myChessPieces b
 
 
-  override this.nextMove (b: Board) : string =
+  member this.nextMove (b: Board) (color: Color) : string =
     let anyPiece : chessPiece list = (this.piecesOnBoard b) //Holds a list of the players´ pieces on the board
     //let any = anyPiece.[0]
     let mutable anyMoves : Position list list = //Collects possibleMoves of the players´ pieces on the board
@@ -215,18 +215,28 @@ type Human (color: Color) =
     printfn "Make a move"
     let pattern = @"[a-h][1-8]\s[a-h][1-8]" //Pattern of chess move e.g. a5 a4
     printfn "Move options: %A: %A" anyPiece.Head anyMoves.Head
+    let input = System.Console.ReadLine() //Takes console input from user
     let move =
       let somePieceMoves : Position list = anyMoves.Head
-      let input = System.Console.ReadLine() //Takes console input from user
-      if Regex.IsMatch(input, pattern) || input = "quit" then //Checks if the console input is valid i.e. if it matches the pattern or matches "quit"
+      if Regex.IsMatch(input, pattern) then //Checks if the console input is valid i.e. if it matches the pattern or matches "quit"
         //input
-        let possibleMove : Position list = [((int input.[0]) - 97, (int input.[1]) - 49); ((int input.[3]) - 97, (int input.[4]) - 49)] //converts the console string input from letter+number to the corresponding coordinate on the board. e.g from a4 to (0,4)
-        if List.exists(fun x -> x = possibleMove.[1]) somePieceMoves || input = "quit" then //Checks if the user input matches any valid moves for the possibleM ove list
-        //if (List.forall(fun x -> x = fst possibleMove) anyMoves)
+        let inputAsMove : Position list = [((int input.[0]) - 97, (int input.[1]) - 49); ((int input.[3]) - 97, (int input.[4]) - 49)] //converts the console string input from letter+number to the corresponding coordinate on the board. e.g from a4 to (0,4)
+        if List.exists(fun x -> x = inputAsMove.[1]) somePieceMoves then //Checks if the user input matches any valid moves for the possibleM ove list
+          printfn "Great Move"
           input //Returns the console input
         else
-          "Invalid move, Try again"
+          printfn "Invalid move, Try again"
+          this.nextMove b color
+      elif input = "quit" then
+        "Okay"
       else
-        this.nextMove b //Reruns the method in case of invalid move input
-    move
-    "onePieceMoves"
+        this.nextMove b color //Reruns the method in case of invalid move input
+    string (input)
+
+// type Game () =
+//   let PlayerBlack = Human(Black)
+//   let PlayerWhite = Human(White)
+//
+//   member this.run =
+//
+//   this.run

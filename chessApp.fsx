@@ -19,7 +19,7 @@ printfn "%A" board
 Array.iter (printPiece board) pieces
 
 let newplayer = Human(White)
-printfn "%A" (newplayer.nextMove board)
+printfn "%A" (newplayer.nextMove board newplayer.playerColor)
 
 // Make moves
 board.move (1,1) (3,3) // Moves a piece from (1,1) to (3,1)
