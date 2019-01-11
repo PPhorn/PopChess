@@ -10,14 +10,14 @@ let player2 = Human Black
 let pieces = [|
   king (White) :> chessPiece;
   rook (White) :> chessPiece;
-  king (Black) :> chessPiece; 
+  king (Black) :> chessPiece;
   rook (Black) :> chessPiece;|]
 // Place pieces on the board
 let placeRooks =
-board.[0,0] <- Some pieces.[0]
-board.[1,1] <- Some pieces.[1]
-board.[7,7] <- Some pieces.[2]
-board.[6,6] <- Some pieces.[3]
+  board.[0,0] <- Some pieces.[0]
+  board.[1,1] <- Some pieces.[1]
+  board.[7,7] <- Some pieces.[2]
+  board.[6,6] <- Some pieces.[3]
 
 let newplayer = Human(White)
 
