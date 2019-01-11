@@ -76,6 +76,8 @@ type chessPiece(color : Color) =
             if (fst possibleMoves.[i] = fst rookList.[j]) || (snd possibleMoves.[i] = snd rookList.[j]) then
               invalidMoves <- possibleMoves.[i] :: invalidMoves
         //invalidMoves for king collision
+        //Hvad nu hvis der ikke er en konge på boardet længere?? Det giver en bug
+        // - det skal vi have fikset.
         let oppkingMoves = fst (b.getVacantNNeighbours oppking.[0])
         for i = 0 to possibleMoves.Length - 1 do
           for j = 0 to oppkingMoves.Length - 1 do
@@ -228,6 +230,9 @@ type Human (color: Color) =
         if (List.exists (fun x -> x = chosenPiece) liste1) && (List.exists(fun x -> x = inputAsMove) movesOfchosenPiece) then //Checks if the user input matches any valid moves for the possibleM ove list
           printfn "Great Move"
           input //Returns the console input
+        elif (List.exists (fun x -> x = chosenPiece) liste1) && not (List.exists(fun x -> x = inputAsMove) movesOfchosenPiece) then
+          printfn "Not a valid move, try again"
+          this.nextMove b p
         else
           printfn "Not a valid chess piece, try again"
           this.nextMove b p
@@ -239,32 +244,24 @@ type Human (color: Color) =
 
 type Game(p1: Human, p2: Human, b: Board) =
     let turn = p1
-    let inputAsMove (input: string) : Position list = 
+    let inputAsMove (input: string) : Position list =
         [((int input.[0]) - 97, (int input.[1]) - 49); ((int input.[3]) - 97, (int input.[4]) - 49)]
-    let moveSource (lst: Position List) : Position = 
+    let moveSource (lst: Position List) : Position =
         lst.[0]
-    let moveTarget (lst: Position List) : Position = 
+    let moveTarget (lst: Position List) : Position =
         lst.[1]
     member this.run(p: Human) =
       Console.Clear()
       printfn "%A" b
       if not (p1.piecesOnBoard b).IsEmpty || not (p2.piecesOnBoard b).IsEmpty then
         match p.playerColor with
-        White -> 
+        White ->
             let move = inputAsMove (p1.nextMove b p)
             b.move (moveSource move) (moveTarget move)
             this.run(p2)
-        | Black -> 
+        | Black ->
             let move = inputAsMove (p2.nextMove b p)
             b.move (moveSource move) (moveTarget move)
             this.run(p1)
       else
         Environment.Exit(0)
-
-// type Game () =
-//   let PlayerBlack = Human(Black)
-//   let PlayerWhite = Human(White)
-//
-//   member this.run (b: Board) (piece : chessPiece) : string =
-
-      // this.Piece.Position = toSquare
