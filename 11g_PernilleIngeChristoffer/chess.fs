@@ -59,10 +59,12 @@ type chessPiece(color : Color) =
 
     let riskZone (b: Board) : Position list =
       if(this.nameOfType.ToLower() = "king") then
+        //if List.exists(fun (x: chessPiece) -> x.nameOfType.ToLower() = "rook") (ChessPieces b) then
         let mutable rookList =
           (ChessPieces b)
           |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "rook")
           |> List.map(fun (x : chessPiece) -> x.position.Value)
+      //if List.exists(fun (x: chessPiece) -> x.nameOfType.ToLower() = "king") (ChessPieces b) then
         let mutable oppking =
           (ChessPieces b)
           |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "king")
@@ -71,13 +73,13 @@ type chessPiece(color : Color) =
           //possibleMoves <- elem.position.Value :: possibleMoves
         let mutable invalidMoves = []
         //Checking for rook collision
+        //if List.exists(fun (x: chessPiece) -> x.nameOfType.ToLower() = "rook") (ChessPieces b) then
         for i = 0 to possibleMoves.Length - 1 do
           for j = 0 to rookList.Length - 1 do
             if (fst possibleMoves.[i] = fst rookList.[j]) || (snd possibleMoves.[i] = snd rookList.[j]) then
               invalidMoves <- possibleMoves.[i] :: invalidMoves
         //invalidMoves for king collision
-        //Hvad nu hvis der ikke er en konge på boardet længere?? Det giver en bug
-        // - det skal vi have fikset.
+        //if List.exists(fun (x: chessPiece) -> x.nameOfType.ToLower() = "rook") (ChessPieces b) then
         let oppkingMoves = fst (b.getVacantNNeighbours oppking.[0])
         for i = 0 to possibleMoves.Length - 1 do
           for j = 0 to oppkingMoves.Length - 1 do
@@ -86,7 +88,14 @@ type chessPiece(color : Color) =
         //possibleMoves <- List.filter(fun x -> x = invalidMoves) possibleMoves
         invalidToSafe b invalidMoves
       else
-        fst (b.getVacantNNeighbours this)
+        //When is a rook
+        let mutable possibleRookKillMoves = List.empty<Position>
+        for elem in (snd (b.getVacantNNeighbours this)) do
+          possibleRookKillMoves <- elem.position.Value :: possibleRookKillMoves
+        let mutable possibleRookMoves = possibleRookKillMoves
+        for elem in (fst (b.getVacantNNeighbours this)) do
+          possibleRookMoves <- elem :: possibleRookMoves
+        possibleRookMoves
 
     (riskZone board, snd (board.getVacantNNeighbours this))
 
@@ -118,6 +127,8 @@ and Board () =
       _array.[a, b] <- p
   /// Produce string of board for, e.g., the printfn function.
   override this.ToString() =
+    let characters =
+      ['h';'g';'f';'e';'d';'c';'b';'a']
     let rec boardStr (i : int) (j : int) : string =
       match (i,j) with
         (8,0) -> ""
@@ -135,7 +146,7 @@ and Board () =
             let str = sprintf "%s\n| %1s " lineSep pieceStr
             str + boardStr 0 1
           | (i,7) ->
-            let str = sprintf "| %1s |\n%s\n" pieceStr lineSep
+            let str = sprintf "| %1s | %c \n%s\n" pieceStr characters.[i] lineSep
             str + boardStr (i+1) 0
           | (i,j) ->
             let str = sprintf "| %1s " pieceStr
@@ -217,6 +228,14 @@ type Human (color: Color) =
       let pattern = @"[a-h][1-8]\s[a-h][1-8]" //Pattern of chess move e.g. a5 a4
       Regex.IsMatch(input, pattern) || (input = "quit")
 
+    let clearPrint (b: Board) =
+      Console.Clear()
+      printf "%A" b
+      for i = 0 to 7 do
+        printf " %2i " (i + 1)
+        if i = 7 then
+          printf "\n \n"
+
     let checkMoveInput =
       let liste1 = this.piecesOnBoard b
       if checkInput && input = "quit" then
@@ -224,19 +243,25 @@ type Human (color: Color) =
       elif checkInput && input <> "quit" then
         let chosenPiece : chessPiece =
           let coordOfchosenPiece = ((int input.[0]) - 97, (int input.[1]) - 49)
-          b.[fst coordOfchosenPiece, snd coordOfchosenPiece].Value
+          if (List.exists (fun (x: chessPiece) -> x.position.Value = coordOfchosenPiece) liste1) then
+            b.[fst coordOfchosenPiece, snd coordOfchosenPiece].Value
+          else
+            (this.piecesOnBoard b).[0]
         let movesOfchosenPiece = fst (chosenPiece.availableMoves b)
         let inputAsMove : Position = ((int input.[3]) - 97, (int input.[4]) - 49) //converts the console string input from letter+number to the corresponding coordinate on the board. e.g from a4 to (0,4)
         if (List.exists (fun x -> x = chosenPiece) liste1) && (List.exists(fun x -> x = inputAsMove) movesOfchosenPiece) then //Checks if the user input matches any valid moves for the possibleM ove list
           printfn "Great Move"
           input //Returns the console input
         elif (List.exists (fun x -> x = chosenPiece) liste1) && not (List.exists(fun x -> x = inputAsMove) movesOfchosenPiece) then
+          clearPrint b
           printfn "Not a valid move, try again"
           this.nextMove b p
         else
+          clearPrint b
           printfn "Not a valid chess piece, try again"
           this.nextMove b p
       else
+        clearPrint b
         printfn "Invalid move, Try again"
         this.nextMove b p
 
@@ -250,18 +275,44 @@ type Game(p1: Human, p2: Human, b: Board) =
         lst.[0]
     let moveTarget (lst: Position List) : Position =
         lst.[1]
+    let quit(input: string) =
+      (input = "quit")
     member this.run(p: Human) =
       Console.Clear()
       printfn "%A" b
+      for i = 0 to 7 do
+        printf " %2i " (i + 1)
+        if i = 7 then
+          printf "\n \n"
       if not (p1.piecesOnBoard b).IsEmpty || not (p2.piecesOnBoard b).IsEmpty then
         match p.playerColor with
         White ->
-            let move = inputAsMove (p1.nextMove b p)
-            b.move (moveSource move) (moveTarget move)
-            this.run(p2)
+            let mutable move = (p1.nextMove b p)
+            if quit(move) then
+              Environment.Exit(0)
+            else
+              let actualMove = (inputAsMove move)
+              b.move (moveSource actualMove) (moveTarget actualMove)
+            if List.exists(fun (x: chessPiece) -> x.nameOfType.ToLower() = "king") (p2.piecesOnBoard b) then
+              this.run(p2)
+            else
+              Console.Clear()
+              printf "%A" b
+              printfn "%A wins." p1.playerColor
+              Environment.Exit(0)
         | Black ->
-            let move = inputAsMove (p2.nextMove b p)
-            b.move (moveSource move) (moveTarget move)
-            this.run(p1)
+            let move = (p2.nextMove b p)
+            if quit(move) then
+              Environment.Exit(0)
+            else
+              let actualMove = (inputAsMove move)
+              b.move (moveSource actualMove) (moveTarget actualMove)
+            if List.exists(fun (x: chessPiece) -> x.nameOfType.ToLower() = "king") (p1.piecesOnBoard b) then
+              this.run(p1)
+            else
+              Console.Clear()
+              printf "%A" b
+              printfn "%A wins." p2.playerColor
+              Environment.Exit(0)
       else
         Environment.Exit(0)
