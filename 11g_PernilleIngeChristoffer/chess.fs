@@ -15,9 +15,20 @@ type chessPiece(color : Color) =
     with get() = _position
     and set(pos) = _position <- pos
   override this.ToString () = // E.g. "K" for white king
+  /// <summary>
+  /// Makes use of the ANSI esc code system to color strings printed in terminal
+  /// </summary>
+  /// <param name="m"> string to be colored</param>
+  /// <param name="i"> ANSI color code of wished color applied to string input
+  //  </param>
+  /// <returns>Returns the string input in the color corresponding to the given
+  ///  color code</returns>
+    let addColor (m: string) (c: int) : string =
+      let esc = string (char 0x1B)
+      sprintf "%s[38;5;%dm%s%s[0m" esc c m esc
     match color with
-      White -> (string this.nameOfType.[0]).ToUpper ()
-      | Black -> (string this.nameOfType.[0]).ToLower ()
+      White -> (addColor((string this.nameOfType.[0]).ToUpper ()) 10)
+      | Black -> (addColor((string this.nameOfType.[0]).ToLower ()) 9)
   /// A list of runs, which is a list of relative movements, e.g.,
   /// [[(1,0); (2,0);...]; [(-1,0); (-2,0)]...]. Runs must be
   /// ordered such that the first in a list is closest to the piece
@@ -80,7 +91,7 @@ type chessPiece(color : Color) =
 /// <summary>
 /// riskZone takes a board, checks whether the chesspiece is a king or a rook
 /// and creates a list of the opponents rooks and king. riskZone then creates
-/// a list of invalid moves. The invalid moves being the available moves 
+/// a list of invalid moves. The invalid moves being the available moves
 /// that the other king also has. To check if the available moves is also a
 /// valid move we also have to consider the rook. To check if there is a
 /// collision between these, we check the if the available moves share a
