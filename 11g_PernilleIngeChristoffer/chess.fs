@@ -30,6 +30,15 @@ type chessPiece(color : Color) =
     //possibleKills gets list of squares with opponent pieces from the opponent
     //function in scope of getVacantNNeighbours
 
+/// <summary>
+/// Loops through a given board, a 2d array consisting of chesspieces options.
+/// Checks whether theres is a piece and if there is then saves it to list.
+/// The chesspieces founds value then gets saved in another list.
+/// And lastly this list gets filtered by color to another list. This list only
+/// contains the opponents chesspieces. The list is then returned.
+/// </summary>
+/// <param name="board">A 2d array board consisting of chesspieces</param>
+/// <returns>A list of the opponents checkpieces</returns>
     let ChessPieces (b: Board) : chessPiece list =
       let mutable newList = List.empty<chessPiece option>
       for i = 0 to 7 do
@@ -47,6 +56,17 @@ type chessPiece(color : Color) =
       //lst
       oppList
 
+/// <summary>
+/// invalidToSafe is a helper function used in riskZone. The function
+/// transforms a list of invalid moves to a list of safe moves.
+/// Compares the list of invalid moves with the list of possible moves
+/// to make sure which moves are possible, and the returns the list of
+/// safe moves.
+/// </summary>
+/// <param name="b">A 2d array board consisting of chesspieces</param>
+/// <param name="riskZoneList">A list of the invalid moves found in
+/// riskZone</param>
+/// <returns>A list of safe moves</returns>
     let invalidToSafe (b: Board) (riskZonelist: Position list) =
       let mutable possibleMoves, possibleKills = b.getVacantNNeighbours this
       for elem in possibleKills do
@@ -57,6 +77,18 @@ type chessPiece(color : Color) =
           safeList <- elem :: safeList
       safeList
 
+/// <summary>
+/// riskZone takes a board, checks whether the chesspiece is a king or a rook
+/// and creates a list of the opponents rooks and king. riskZone then creates
+/// a list of invalid moves. The invalid moves being the available moves 
+/// that the other king also has. To check if the available moves is also a
+/// valid move we also have to consider the rook. To check if there is a
+/// collision between these, we check the if the available moves share a
+/// coordinate with an opponent rook. T
+/// </summary>
+/// <param name="arr">An array</param>
+/// <param name="i">The index</param>
+/// <returns>An element or an Unchecked.defaultof</returns>
     let riskZone (b: Board) : Position list =
       if(this.nameOfType.ToLower() = "king") then
         //if List.exists(fun (x: chessPiece) -> x.nameOfType.ToLower() = "rook") (ChessPieces b) then
