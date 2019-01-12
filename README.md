@@ -1,2 +1,0 @@
-# PopChess
-Chess
