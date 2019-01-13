@@ -62,7 +62,7 @@ mere et forklæde til rapporten. For korte rapporter er forordet ofte udeladt.
 
 VORES EGNE FORORD FRA ISLE ROYALE
 \section*{Preface}
-As our first semester course in Programming and Problem Solving has entered a new programming paradigm, namely object oriented (OO) programming, we, three budding computer scientists have build a small environment based on the small island Isle Royale. We've used the multi paradigm programming language Fsharp (F\#), to code our entire OO environment.
+As a part of our first semester course in Programming and Problem Solving, we, three budding computer scientists have improved a chess game. We've used the multi paradigm programming language Fsharp (F\#), to code our entire OO environment.
 
 2 Introduktion
 Dette afsnit skal give en indledning til rapportens emne på et overordnet plan. Introduktion skal typisk
@@ -84,6 +84,11 @@ afsnit indeholder ofte en overordnet beskrivelse af de centrale datastrukturer s
 (dele af) funktioner og deres typer.
 
 \section*{Problem analysis \& design}
+The main problem with the improved chess game was to make sure that the king could not move to a square that was an available move for an opponent piece. We considered many approaches to solve this problem.
+Our first approach was to use the already implemented functionality of the getVacantNNeighbours, which returned a list of available moves and which opponent pieces that could be killed in a move. We
+would then use this list og available kills to check if an available move would cause an opponent piece to have a king as a kill. We decided not to do this as it was going to slow down the game. We decided to
+check if the kings available moves were the same as the opponent kings available moves and if they are we then removed them as available moves. To check if there was a collision of the available moves with the rook we
+decided to check if one of the coordinates of the kings avialable moves was also one of the coordinates of the rook.
 DET HAR VI IKKE VÆRET SUPER GODE TIL AT SKRIVE TIDLIGERE, VI HAR SLET IKKE TIDLIGERE SKREVET OM LØSNINGSMULIGHEDER, SÅ DET TÆNKER JEG ER DET VI FOKUSERER PÅ AT SKRIVE LIDT OM.
 
 
