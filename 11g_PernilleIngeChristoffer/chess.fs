@@ -42,14 +42,14 @@ type chessPiece(color : Color) =
     //function in scope of getVacantNNeighbours
 
 /// <summary>
-/// Loops through a given board, a 2d array consisting of chesspieces options.
-/// Checks whether theres is a piece and if there is then saves it to list.
-/// The chesspieces founds value then gets saved in another list.
+/// Loops through a given board, a 2d array consisting of chesspiece options.
+/// Checks whether there is a piece and if there is then saves it to a list.
+/// The chesspieces founds value the get saved in another list.
 /// And lastly this list gets filtered by color to another list. This list only
 /// contains the opponents chesspieces. The list is then returned.
 /// </summary>
-/// <param name="board">A 2d array board consisting of chesspieces</param>
-/// <returns>A list of the opponents checkpieces</returns>
+/// <param name="b">A 2d array board consisting of chesspieces</param>
+/// <returns>A list of the opponents chesspieces</returns>
     let ChessPieces (b: Board) : chessPiece list =
       let mutable newList = List.empty<chessPiece option>
       for i = 0 to 7 do
@@ -70,13 +70,12 @@ type chessPiece(color : Color) =
 /// <summary>
 /// invalidToSafe is a helper function used in riskZone. The function
 /// transforms a list of invalid moves to a list of safe moves.
-/// Compares the list of invalid moves with the list of possible moves
-/// to make sure which moves are possible, and the returns the list of
-/// safe moves.
+/// Compares the list of invalid moves with a list of possible moves
+/// to make sure which moves are possible, and return the list of
+/// safe moves
 /// </summary>
 /// <param name="b">A 2d array board consisting of chesspieces</param>
-/// <param name="riskZoneList">A list of the invalid moves found in
-/// riskZone</param>
+/// <param name="riskZoneList">A list of invalid moves found in riskZone</param>
 /// <returns>A list of safe moves</returns>
     let invalidToSafe (b: Board) (riskZonelist: Position list) =
       let mutable possibleMoves, possibleKills = b.getVacantNNeighbours this
@@ -94,12 +93,13 @@ type chessPiece(color : Color) =
 /// a list of invalid moves. The invalid moves being the available moves
 /// that the other king also has. To check if the available moves is also a
 /// valid move we also have to consider the rook. To check if there is a
-/// collision between these, we check the if the available moves share a
-/// coordinate with an opponent rook. T
+/// collision between these, we check if the available moves share a
+/// coordinate with an opponent rook. The list of invalid moves is then
+/// with invalidToSafe being transformed to safe moves, and is the safe moves
+/// are returned.
 /// </summary>
-/// <param name="arr">An array</param>
-/// <param name="i">The index</param>
-/// <returns>An element or an Unchecked.defaultof</returns>
+/// <param name="b">A 2d array board consisting of chesspieces</param>
+/// <returns>A list of safe moves</returns>
     let riskZone (b: Board) : Position list =
       if(this.nameOfType.ToLower() = "king") then
         //if List.exists(fun (x: chessPiece) -> x.nameOfType.ToLower() = "rook") (ChessPieces b) then
@@ -241,10 +241,18 @@ type Player (color: Color) =
   abstract member nameOfType : string
   abstract member piecesOnBoard : Board -> chessPiece list
 
+/// The human class inherits the player class and overrides the members
 type Human (color: Color) =
   inherit Player(color)
   override this.nameOfType = "Player" + string(color)
 
+/// <summary>
+/// The member piecesOnBoard takes a board, loops through the board
+/// and creates a list of the chesspieces. It then returns the 
+/// chesspieces that are of the player color.
+/// </summary>
+/// <param name="b">A 2d array board consisting of chesspieces</param>
+/// <returns>A list of chesspieces in a color</returns>
   override this.piecesOnBoard (b: Board) : chessPiece list =
     let myChessPieces (b: Board) : chessPiece list =
       let mutable myList = List.empty<chessPiece option>
@@ -259,18 +267,31 @@ type Human (color: Color) =
       let oppList =
         List.filter (fun (x : chessPiece) -> x.color = color) pieceList
       oppList
-    //printfn "WOW: %A"
     myChessPieces b
 
-
+/// <summary>
+/// The nextMove member takes a board and a human and asks for an input, this
+/// input is then checked with checkInput and checkMoveInput to see if the move
+/// is a valid move.
+/// </summary>
+/// <param name="b">A 2d array board consisting of chesspieces</param>
+/// <param name="p">A human</param>
+/// <returns>A list of safe moves</returns>
   member this.nextMove (b: Board) (p: Human) : string =
     printfn "Make a move Player %A" p.playerColor
     let mutable input = System.Console.ReadLine() //Takes console input from user
 
+/// <summary>
+/// checkInput checks if the input is the pattern or the word quit.
+/// </summary>
+/// <returns>A boolean</returns>
     let checkInput =
-      let pattern = @"[a-h][1-8]\s[a-h][1-8]" //Pattern of chess move e.g. a5 a4
+      let pattern = @"[a-h][1-8]\s[a-h][1-8]" //Pattern of move e.g. a5 a4
       Regex.IsMatch(input, pattern) || (input = "quit")
 
+/// <summary>
+/// ClearPrint is used to print the board.
+/// </summary>
     let clearPrint (b: Board) =
       Console.Clear()
       printf "%A" b
@@ -279,6 +300,13 @@ type Human (color: Color) =
         if i = 7 then
           printf "\n \n"
 
+/// <summary>
+/// checkMoveInput checks if the input move was valid. The move is valid if the
+/// chesspiece is in the list of chesspieces returned by piecesOnBoard and if
+/// the move is an available move for the chesspiece. If the move is not valid
+/// the nextMove will be called.
+/// </summary>
+/// <returns>The input</returns>
     let checkMoveInput =
       let liste1 = this.piecesOnBoard b
       if checkInput && input = "quit" then
@@ -312,14 +340,29 @@ type Human (color: Color) =
 
 type Game(p1: Human, p2: Human, b: Board) =
     let turn = p1
+
+    //Takes an input as a string and transforms it to a list of positions
     let inputAsMove (input: string) : Position list =
         [((int input.[0]) - 97, (int input.[1]) - 49); ((int input.[3]) - 97, (int input.[4]) - 49)]
+
+    //Returns the first part of the position list
     let moveSource (lst: Position List) : Position =
         lst.[0]
+
+    //Returns the second part of the position list
     let moveTarget (lst: Position List) : Position =
         lst.[1]
+
+    //Checks if the input string is quit
     let quit(input: string) =
       (input = "quit")
+
+/// <summary>
+/// run controls the game. It prints the board, checks if the game is finished
+/// and uses the boards move to move the pieces.
+/// </summary>
+/// <param name="p">A human</param>
+/// <returns>A boolean</returns>
     member this.run(p: Human) =
       Console.Clear()
       printfn "%A" b
