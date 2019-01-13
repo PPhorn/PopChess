@@ -232,6 +232,7 @@ and Board () =
           |> List.choose snd //pipen piper en liste ind i list.choose, det er det
           //samme som  f(x) --> x|> f. list.choose tager to argumenter, men er her kun givet
           //1 nemlig snd. Derfor piper vi en liste ind på den.
+          |> List.filter (fun (x : chessPiece) -> x.color <> piece.color)
         (vacant, opponent)(*//§\label{chessBoardEnd}§*)
 
 [<AbstractClass>]
@@ -248,7 +249,7 @@ type Human (color: Color) =
 
 /// <summary>
 /// The member piecesOnBoard takes a board, loops through the board
-/// and creates a list of the chesspieces. It then returns the 
+/// and creates a list of the chesspieces. It then returns the
 /// chesspieces that are of the player color.
 /// </summary>
 /// <param name="b">A 2d array board consisting of chesspieces</param>
