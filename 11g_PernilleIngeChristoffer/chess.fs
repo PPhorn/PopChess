@@ -102,36 +102,29 @@ type chessPiece(color : Color) =
 /// <returns>A list of safe moves</returns>
     let riskZone (b: Board) : Position list =
       if(this.nameOfType.ToLower() = "king") then
-        //if List.exists(fun (x: chessPiece) -> x.nameOfType.ToLower() = "rook") (ChessPieces b) then
         let mutable rookList =
           (ChessPieces b)
           |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "rook")
           |> List.map(fun (x : chessPiece) -> x.position.Value)
-      //if List.exists(fun (x: chessPiece) -> x.nameOfType.ToLower() = "king") (ChessPieces b) then
         let mutable oppking =
           (ChessPieces b)
           |> List.filter(fun (x : chessPiece) -> x.nameOfType.ToLower() = "king")
         let mutable possibleMoves, _ = b.getVacantNNeighbours this
-        //for elem in possibleKills do
-          //possibleMoves <- elem.position.Value :: possibleMoves
         let mutable invalidMoves = []
         //Checking for rook collision
-        //if List.exists(fun (x: chessPiece) -> x.nameOfType.ToLower() = "rook") (ChessPieces b) then
         for i = 0 to possibleMoves.Length - 1 do
           for j = 0 to rookList.Length - 1 do
             if (fst possibleMoves.[i] = fst rookList.[j]) || (snd possibleMoves.[i] = snd rookList.[j]) then
               invalidMoves <- possibleMoves.[i] :: invalidMoves
         //invalidMoves for king collision
-        //if List.exists(fun (x: chessPiece) -> x.nameOfType.ToLower() = "rook") (ChessPieces b) then
         let oppkingMoves = fst (b.getVacantNNeighbours oppking.[0])
         for i = 0 to possibleMoves.Length - 1 do
           for j = 0 to oppkingMoves.Length - 1 do
             if (possibleMoves.[i] = oppkingMoves.[j]) then
               invalidMoves <- possibleMoves.[i] :: invalidMoves
-        //possibleMoves <- List.filter(fun x -> x = invalidMoves) possibleMoves
         invalidToSafe b invalidMoves
       else
-        //When is a rook
+        //When a rook is being moved
         let mutable possibleRookKillMoves = List.empty<Position>
         for elem in (snd (b.getVacantNNeighbours this)) do
           possibleRookKillMoves <- elem.position.Value :: possibleRookKillMoves
