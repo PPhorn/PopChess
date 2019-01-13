@@ -61,10 +61,7 @@ The main problem with the improved chess game was to make sure that the king cou
 Our first approach was to use the already implemented functionality of the getVacantNNeighbours, which returned a list of available moves and which opponent pieces that could be killed in a move. We
 would then use this list og available kills to check if an available move would cause an opponent piece to have a king as a kill. We decided not to do this as it was going to slow down the game. We decided to
 check if the kings available moves were the same as the opponent kings available moves and if they are we then removed them as available moves. To check if there was a collision of the available moves with the rook we
-decided to check if one of the coordinates of the kings avialable moves was also one of the coordinates of the rook.
-
-
-DET HAR VI IKKE VÆRET SUPER GODE TIL AT SKRIVE TIDLIGERE, VI HAR SLET IKKE TIDLIGERE SKREVET OM LØSNINGSMULIGHEDER, SÅ DET TÆNKER JEG ER DET VI FOKUSERER PÅ AT SKRIVE LIDT OM.
+decided to check if one of the coordinates of the kings avialable moves was also one of the coordinates of the rook. In the following section we created a figure of the structure of the solution.
 
 
 \subsection*{UML}
