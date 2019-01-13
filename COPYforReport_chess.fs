@@ -114,7 +114,8 @@ type chessPiece(color : Color) =
         //Checking for rook collision
         for i = 0 to possibleMoves.Length - 1 do
           for j = 0 to rookList.Length - 1 do
-            if (fst possibleMoves.[i] = fst rookList.[j]) || (snd possibleMoves.[i] = snd rookList.[j]) then
+            if (fst possibleMoves.[i] = fst rookList.[j])
+            || (snd possibleMoves.[i] = snd rookList.[j]) then
               invalidMoves <- possibleMoves.[i] :: invalidMoves
         //invalidMoves for king collision
         let oppkingMoves = fst (b.getVacantNNeighbours oppking.[0])

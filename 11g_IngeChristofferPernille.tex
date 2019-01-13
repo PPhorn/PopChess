@@ -110,12 +110,14 @@ DET HAR VI IKKE VÆRET SUPER GODE TIL AT SKRIVE TIDLIGERE, VI HAR SLET IKKE TIDL
 \section*{Program description}
 
 From the assignment material we were given a substantial contribution of code, which forms the base for the main functionality of the game.
-One of the biggest challenges we faced in getting the code one step closer to a playable game was, to contain the moves available to the king piece.
+As mentioned in \textsc{Problem analysis \& design} one of the biggest challenges we faced in getting the code one step closer to a playable game was, to contain the moves available to the king piece.
 In its original state, the code given from the assignment allowed the king piece to make moves, which were self-endangering. We therefore had to develop the code, so that this possibility was eliminated.
 
-To do this we developed a function \texttt{riskZone}, that evaluates the piece, which a player tries to move, and given a king piece excludes any "illegal" moves by cross-referencing the x and y coordinate of the target position of the move, with the x and y coordinate of any opponent piece. Then using this to check if there was any duplicates. This made way for creating a list of the coordinates of any opponent piece with an x or y coordinate matching those of the target position. Finally we use this list, to filter the king piece list of possible moves from holding the risky/illegal moves.\\
+To do this we developed a function \texttt{riskZone}, that evaluates the piece, which a player tries to move, and given a king piece excludes any "illegal" moves by cross-referencing the $x$ and $y$ coordinate of the target position of the move, with the $x$ and $y$ coordinate of any opponent piece. Then using this to check if there was any duplicates. This made way for creating a list of the coordinates of any opponent piece with an $x$ or $y$ coordinate matching those of the target position. Finally we use this list, to filter the king piece list of possible moves from holding the risky/illegal moves.\\
 
 As the above restriction only applies to the king piece, in regards to the possible moves of the rook piece, we only had to link the pre-developed lists of the valid moves + possible kills of the current piece, into one joined list of possible moves.
+
+\lstinputlisting[language=FSharp, firstline=103, lastline=136]{COPYforReport_chess.fs}
 
 \subsection*{User manual}
 
